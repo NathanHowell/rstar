@@ -43,15 +43,16 @@ impl<T: RTreeObject> Iterator for ClusterGroupIterator<T> {
             }
             len => {
                 let slab_axis = self.cluster_dimension;
+                let partition_point = len - self.slab_size;
                 // Partition so that the slab elements end up at the tail.
                 T::Envelope::partition_envelopes(
                     slab_axis,
                     &mut self.remaining,
-                    len - self.slab_size,
+                    partition_point,
                 );
                 // Drain from the end into a new Vec with exact capacity.
                 // self.remaining keeps its allocation for reuse on the next iteration.
-                self.remaining.drain(len - self.slab_size..).collect::<Vec<_>>().into()
+                self.remaining.drain(partition_point..).collect::<Vec<_>>().into()
             }
         }
     }
